@@ -17,17 +17,24 @@ const getDayTime = (sunset, sunrise) => {
 const WeatherIcon = (weather, sys) => {
   let dayTime = getDayTime(sys.sunrise, sys.sunset);
   switch (weather[0]?.description) {
-    case "scattered clouds":
-      return e("img", {
-        key: weather[0]?.description,
-        src: `./assets/svgs/few_clouds.svg`,
-        className: "weather-panel__weather-icon",
-      });
-      break;
+    case "scattered clouds" || "few clouds" || "broken clouds":
+      if (dayTime == "day") {
+        return e("img", {
+          key: dayTime,
+          src: `./assets/svg/partly_cloudy_day.svg`,
+          className: "weather-panel__weather-icon",
+        });
+      } else {
+        return e("img", {
+          key: dayTime,
+          src: `./assets/svg/partly_cloudy_night.svg`,
+          className: "weather-panel__weather-icon",
+        });
+      }
     case "overcast clouds":
       return e("img", {
         key: weather[0]?.description,
-        src: `./assets/svgs/overcast.svg`,
+        src: `./assets/svg/overcast.svg`,
         className: "weather-panel__weather-icon",
       });
       break;
@@ -35,13 +42,13 @@ const WeatherIcon = (weather, sys) => {
       if (dayTime == "day") {
         return e("img", {
           key: dayTime,
-          src: `./assets/svgs/clear_sky_day.svg`,
+          src: `./assets/svg/clear_sky_day.svg`,
           className: "weather-panel__weather-icon",
         });
       } else {
         return e("img", {
           key: dayTime,
-          src: `./assets/svgs/clear_sky_night.svg`,
+          src: `./assets/svg/clear_sky_night.svg`,
           className: "weather-panel__weather-icon",
         });
       }
