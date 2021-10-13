@@ -14,7 +14,8 @@ const getDayTime = (sunset, sunrise) => {
   }
 };
 
-const getWeatherIcon = (daytime, weather) => {
+const WeatherIcon = (weather, sys) => {
+  let dayTime = getDayTime(sys.sunrise, sys.sunset);
   switch (weather[0]?.description) {
     case "scattered clouds":
       return e("img", {
@@ -31,15 +32,15 @@ const getWeatherIcon = (daytime, weather) => {
       });
       break;
     default:
-      if (daytime == "day") {
+      if (dayTime == "day") {
         return e("img", {
-          key: daytime,
+          key: dayTime,
           src: `./assets/svgs/clear_sky_day.svg`,
           className: "weather-panel__weather-icon",
         });
       } else {
         return e("img", {
-          key: daytime,
+          key: dayTime,
           src: `./assets/svgs/clear_sky_night.svg`,
           className: "weather-panel__weather-icon",
         });
@@ -48,7 +49,7 @@ const getWeatherIcon = (daytime, weather) => {
   }
 };
 
-const windDirection = (deg) => {
+const getWindDirection = (deg) => {
   if (deg > 11.25 && deg < 33.75) {
     return "NNE";
   } else if (deg > 33.75 && deg < 56.25) {
@@ -84,78 +85,57 @@ const windDirection = (deg) => {
   }
 };
 
-class SearchBar extends React.Component {
-  render() {
-    return e("input", {
-      key: "search-bar",
-    });
-  }
-}
+const WindDetails = (wind) => {
+  return e("div", {key: "wind-panel", className: "wind-panel"}, [
+    e("p", {key: "speed"}, `Windspeed: ${Math.floor(wind.speed)} km/h`),
+    e("p", {key: "direction"}, "Winddirection: " + getWindDirection(wind.deg)),
+  ]);
+};
 
-const WindPanel = (wind) => {
-  return React.createElement(
+const WeatherDetails = (main, name) => {
+  return e(
     "div",
-    {key: "wind-panel", className: "wind-panel"},
-    [
-      React.createElement(
-        "p",
-        {key: "speed"},
-        `Windspeed: ${Math.floor(wind.speed)} km/h`
+    {key: `weather-details-${name}`},
+    e(
+      "div",
+      {key: `info-${name}`, className: "weather-panel__weather-details"},
+      e(
+        "span",
+
+        {key: `temp_max-${name}`, className: "weather-details__max-temp"},
+        "H: " + Math.floor(main.temp_max) + " \u2103"
       ),
-      React.createElement(
-        "p",
-        {key: "direction"},
-        "Winddirection: " + windDirection(wind.deg)
-      ),
-    ]
+      e(
+        "span",
+        {key: `temp_min-${name}`, className: "weather-details__min-temp"},
+        "L: " + Math.floor(main.temp_min) + " \u2103"
+      )
+    )
   );
 };
 
-const WeatherPanel = ({main, weather, wind, name, sys}) => {
-  console.log(name);
-  let dayTime = getDayTime(sys.sunrise, sys.sunset);
-  console.log(dayTime);
-  let imageElement = getWeatherIcon(dayTime, weather);
+const GeneralData = (main, name, weather) => {
   const a = weather[0]?.description;
-  let cityElement = React.createElement("h2", {key: "city"}, name);
-  let weatherElement = React.createElement(
-    "h6",
-    {key: `weather-${name}`, className: "weather-panel__weather-description"},
-    a
-  );
-  let temperatureElement = React.createElement(
-    "h2",
-    {key: `temperature-${name}`},
-    Math.floor(main.temp) + " \u2103"
-  );
-  let TemperatureElement = React.createElement(
+  return e(
     "div",
-    {key: `info-${name}`, className: "weather-panel__weather-details"},
-    React.createElement(
-      "span",
-
-      {key: `temp_max-${name}`, className: "weather-details__max-temp"},
-      "H: " + Math.floor(main.temp_max) + " \u2103"
+    {key: `general-weather-${name}`},
+    e("h2", {key: "city"}, name),
+    e(
+      "h6",
+      {key: `weather-${name}`, className: "weather-panel__weather-description"},
+      a
     ),
-    React.createElement(
-      "span",
-      {key: `temp_min-${name}`, className: "weather-details__min-temp"},
-      "L: " + Math.floor(main.temp_min) + " \u2103"
-    )
+    e("h2", {key: `temperature-${name}`}, Math.floor(main.temp) + " \u2103")
   );
+};
 
-  return React.createElement(
-    "div",
-    {key: `weather-panel-${name}`, className: "panel"},
-    [
-      imageElement,
-      cityElement,
-      weatherElement,
-      temperatureElement,
-      TemperatureElement,
-      WindPanel(wind),
-    ]
-  );
+const WeatherPanel = ({main, name, sys, weather, wind}) => {
+  return e("div", {key: `weather-panel-${name}`, className: "panel"}, [
+    WeatherIcon(weather, sys),
+    GeneralData(main, name, weather),
+    WeatherDetails(main, name),
+    WindDetails(wind),
+  ]);
 };
 
 class App extends React.Component {
@@ -189,12 +169,12 @@ class App extends React.Component {
   }
 
   render() {
-    return React.createElement(
+    return e(
       "div",
       {className: "weather-panel center"},
       this.state.locations
         .sort((a, b) => a.name.localeCompare(b.name))
-        .map((location) => WeatherPanel(location))
+        .map((locationData) => WeatherPanel(locationData))
     );
   }
 }
