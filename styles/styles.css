@@ -16,7 +16,7 @@ h6 {
 
 .center {
   margin: auto;
-  width: 50%;
+  width: 100%;
 }
 
 .panel {
@@ -24,9 +24,13 @@ h6 {
   font-size: 2rem;
   font-weight: 200;
   border: 1px solid grey;
-  margin-bottom: 1rem;
+  margin-bottom: 3rem;
   padding: 1rem;
   border-radius: 5px;
+}
+
+.weather-panel__weather-description {
+  font-size: 1rem;
 }
 
 .weather-panel__weather-icon {
@@ -40,6 +44,7 @@ h6 {
   justify-content: space-between;
   border-top: 1px solid;
   margin-top: 2rem;
+  padding-top: 1rem;
 }
 
 .wind-panel {

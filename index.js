@@ -1,8 +1,52 @@
 "use strict";
 
 const cities = [, "cologne", "new%20york", "perth"];
-const element = React.createElement;
+const e = React.createElement;
 const weatherContainer = document.querySelector("#container");
+
+const getDayTime = (sunset, sunrise) => {
+  let timeInMilliSeconds = +new Date();
+  let timeInSeconds = Math.floor(timeInMilliSeconds / 1000);
+  if (sunset - sunrise <= 0 && sunrise - timeInSeconds >= 0) {
+    return "day";
+  }
+  return "night";
+};
+
+const getWeatherIcon = (daytime, weather) => {
+  switch (weather[0]?.description) {
+    case "scattered clouds":
+      return e("img", {
+        key: weather[0]?.description,
+        src: `./assets/svgs/few_clouds.svg`,
+        className: "weather-panel__weather-icon",
+      });
+      break;
+    case "overcast clouds":
+      return e("img", {
+        key: weather[0]?.description,
+        src: `./assets/svgs/overcast.svg`,
+        className: "weather-panel__weather-icon",
+      });
+      break;
+    default:
+      if (daytime == "day") {
+        return e("img", {
+          key: daytime,
+          src: `./assets/svgs/clear_sky_day.svg`,
+          className: "weather-panel__weather-icon",
+        });
+      } else {
+        return e("img", {
+          key: daytime,
+          src: `./assets/svgs/clear_sky_night.svg`,
+          className: "weather-panel__weather-icon",
+        });
+      }
+      break;
+  }
+};
+
 const windDirection = (deg) => {
   if (deg > 11.25 && deg < 33.75) {
     return "NNE";
@@ -41,7 +85,7 @@ const windDirection = (deg) => {
 
 class SearchBar extends React.Component {
   render() {
-    return element("input", {
+    return e("input", {
       key: "search-bar",
     });
   }
@@ -66,40 +110,40 @@ const WindPanel = (wind) => {
   );
 };
 
-const WeatherPanel = ({main, weather, wind, name}) => {
-  let timestamp = +new Date();
-  let imageElement = React.createElement("img", {
-    src: `./assets/svgs/sunny.svg`,
-    className: "weather-panel__weather-icon",
-  });
+const WeatherPanel = ({main, weather, wind, name, sys}) => {
+  let dayTime = getDayTime(sys.sunrise, sys.sunset);
+  let imageElement = getWeatherIcon(dayTime, weather);
   const a = weather[0]?.description;
-  a?.toUpperCase;
   let cityElement = React.createElement("h2", {key: "city"}, name);
-  let weatherElement = React.createElement("h6", {key: "weather"}, a);
+  let weatherElement = React.createElement(
+    "h6",
+    {key: `weather-${name}`, className: "weather-panel__weather-description"},
+    a
+  );
   let temperatureElement = React.createElement(
     "h2",
-    {key: "temperature"},
+    {key: `temperature-${name}`},
     Math.floor(main.temp) + " \u2103"
   );
   let TemperatureElement = React.createElement(
     "div",
-    {key: "info", className: "weather-panel__weather-details"},
+    {key: `info-${name}`, className: "weather-panel__weather-details"},
     React.createElement(
       "span",
 
-      {key: "temp_max", className: "weather-details__max-temp"},
+      {key: `temp_max-${name}`, className: "weather-details__max-temp"},
       "H: " + Math.floor(main.temp_max) + " \u2103"
     ),
     React.createElement(
       "span",
-      {key: "temp_min", className: "weather-details__min-temp"},
+      {key: `temp_min-${name}`, className: "weather-details__min-temp"},
       "L: " + Math.floor(main.temp_min) + " \u2103"
     )
   );
 
   return React.createElement(
     "div",
-    {key: "weather-panel", className: "weather-panel panel"},
+    {key: `weather-panel-${name}`, className: "weather-panel panel"},
     [
       imageElement,
       cityElement,
@@ -109,14 +153,6 @@ const WeatherPanel = ({main, weather, wind, name}) => {
       WindPanel(wind),
     ]
   );
-};
-
-const isDayTime = (sunset, sunrise) => {
-  let date = new Date();
-  if (date <= sunset && date >= sunrise) {
-    return true;
-  }
-  return false;
 };
 
 class App extends React.Component {
@@ -158,4 +194,4 @@ class App extends React.Component {
   }
 }
 
-ReactDOM.render(element(App, cities), weatherContainer);
+ReactDOM.render(e(App, cities), weatherContainer);
