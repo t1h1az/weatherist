@@ -1,16 +1,17 @@
 "use strict";
 
-const cities = [, "cologne", "new%20york", "perth"];
+const cities = ["cologne", "new%20york", "perth"];
 const e = React.createElement;
 const weatherContainer = document.querySelector("#container");
 
 const getDayTime = (sunset, sunrise) => {
   let timeInMilliSeconds = +new Date();
   let timeInSeconds = Math.floor(timeInMilliSeconds / 1000);
-  if (sunset - sunrise <= 0 && sunrise - timeInSeconds >= 0) {
+  if (timeInSeconds <= sunset && timeInSeconds >= sunrise) {
     return "day";
+  } else {
+    return "night";
   }
-  return "night";
 };
 
 const getWeatherIcon = (daytime, weather) => {
@@ -111,7 +112,9 @@ const WindPanel = (wind) => {
 };
 
 const WeatherPanel = ({main, weather, wind, name, sys}) => {
+  console.log(name);
   let dayTime = getDayTime(sys.sunrise, sys.sunset);
+  console.log(dayTime);
   let imageElement = getWeatherIcon(dayTime, weather);
   const a = weather[0]?.description;
   let cityElement = React.createElement("h2", {key: "city"}, name);
@@ -143,7 +146,7 @@ const WeatherPanel = ({main, weather, wind, name, sys}) => {
 
   return React.createElement(
     "div",
-    {key: `weather-panel-${name}`, className: "weather-panel panel"},
+    {key: `weather-panel-${name}`, className: "panel"},
     [
       imageElement,
       cityElement,
@@ -187,9 +190,11 @@ class App extends React.Component {
 
   render() {
     return React.createElement(
-      "main",
-      {className: "center"},
-      this.state.locations.map((location) => WeatherPanel(location))
+      "div",
+      {className: "weather-panel center"},
+      this.state.locations
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((location) => WeatherPanel(location))
     );
   }
 }
