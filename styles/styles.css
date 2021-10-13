@@ -4,7 +4,7 @@ body {
   /* background-color: rgba(0, 0, 0, 1); */
   color: rgba(255, 255, 255, 1);
   padding: 2rem;
-  background-image: url("../assets/night_sky.png");
+  background-image: url("../assets/night_sky.jpg");
   background-repeat: no-repeat;
   background-size: 100% 100%;
 }
