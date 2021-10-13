@@ -1,5 +1,5 @@
-# weatherist
-webapp showing  current weather information
+# Weatherist
+webapp fetching current weather information
 
 ## How to use
 

@@ -1,0 +1,63 @@
+body {
+  min-height: 100vh;
+  font-family: "Roboto";
+  /* background-color: rgba(0, 0, 0, 1); */
+  color: rgba(255, 255, 255, 1);
+  padding: 2rem;
+  background-image: url("../assets/night_sky.png");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+h2,
+h6 {
+  text-align: center;
+}
+
+.center {
+  margin: auto;
+  width: 100%;
+}
+
+.panel {
+  background-color: rgba(0, 0, 0, 0.8);
+  font-size: 2rem;
+  font-weight: 200;
+  border: 1px solid grey;
+  margin-bottom: 3rem;
+  padding: 1rem;
+  border-radius: 5px;
+}
+
+.weather-panel__weather-description {
+  font-size: 1rem;
+}
+
+.weather-panel__weather-icon {
+  float: left;
+  height: 8rem;
+}
+
+.weather-panel__weather-details {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  border-top: 1px solid;
+  margin-top: 2rem;
+  padding-top: 1rem;
+}
+
+.wind-panel {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.weather-details__max-temp,
+.weather-details__min-temp {
+  font-size: 1rem;
+}
+
+.wind-panel > p {
+  font-size: 1rem;
+}
