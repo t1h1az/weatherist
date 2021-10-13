@@ -119,21 +119,6 @@ const isDayTime = (sunset, sunrise) => {
   return false;
 };
 
-const requestWeather = () => {
-  return fetch(
-    `http://api.openweathermap.org/data/2.5/weather?q=cologne&appid=ff84f45749b2a4665cf37312097a278b&units=metric`
-  )
-    .then((response) => {
-      response.json().then((data) => {
-        const {name, wind, weather, main, sys} = data;
-        this.setState({city: name, wind, weather, main, sys});
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
-
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -162,7 +147,7 @@ class App extends React.Component {
 
   requestWeather() {
     return fetch(
-      `http://api.openweathermap.org/data/2.5/weather?q=cologne&appid=ff84f45749b2a4665cf37312097a278b&units=metric`
+      `https://api.openweathermap.org/data/2.5/weather?q=cologne&appid=ff84f45749b2a4665cf37312097a278b&units=metric`
     )
       .then((response) => {
         response.json().then((data) => {
