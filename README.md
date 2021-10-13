@@ -5,4 +5,4 @@ webapp showing  current weather information
 
 - download project
 - open index.html in browser
-
+- best viewed on mobile
