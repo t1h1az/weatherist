@@ -110,12 +110,12 @@ const WeatherDetails = (main, name) => {
         "span",
 
         {key: `temp_max-${name}`, className: "weather-details__max-temp"},
-        "H: " + Math.floor(main.temp_max) + " \u2103"
+        "High: " + Math.floor(main.temp_max) + " \u2103"
       ),
       e(
         "span",
         {key: `temp_min-${name}`, className: "weather-details__min-temp"},
-        "L: " + Math.floor(main.temp_min) + " \u2103"
+        "Low: " + Math.floor(main.temp_min) + " \u2103"
       )
     )
   );
