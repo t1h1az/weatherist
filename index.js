@@ -1,6 +1,6 @@
 "use strict";
 
-const cities = ["new%20york", "cologne", "tokyo"];
+const cities = [, "cologne", "new%20york", "perth"];
 const element = React.createElement;
 const weatherContainer = document.querySelector("#container");
 const windDirection = (deg) => {
@@ -66,7 +66,7 @@ const WindPanel = (wind) => {
   );
 };
 
-const WeatherPanel = ({main, city, weather, wind}) => {
+const WeatherPanel = ({main, weather, wind, name}) => {
   let timestamp = +new Date();
   let imageElement = React.createElement("img", {
     src: `./assets/svgs/sunny.svg`,
@@ -74,7 +74,7 @@ const WeatherPanel = ({main, city, weather, wind}) => {
   });
   const a = weather[0]?.description;
   a?.toUpperCase;
-  let cityElement = React.createElement("h2", {key: "city"}, city);
+  let cityElement = React.createElement("h2", {key: "city"}, name);
   let weatherElement = React.createElement("h6", {key: "weather"}, a);
   let temperatureElement = React.createElement(
     "h2",
@@ -99,7 +99,7 @@ const WeatherPanel = ({main, city, weather, wind}) => {
 
   return React.createElement(
     "div",
-    {key: "weather-panel", className: "weather-panel"},
+    {key: "weather-panel", className: "weather-panel panel"},
     [
       imageElement,
       cityElement,
@@ -123,48 +123,37 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      searchTerm: "",
-      dayTime: false,
-      city: "",
-      wind: {
-        speed: "",
-        deg: "",
-      },
-      weather: "",
-      main: {
-        feels_like: "",
-        humidity: "",
-        temp: "",
-        temp_max: "",
-        temp_min: "",
-      },
-      sys: "",
+      locations: [],
     };
-  }
-  componentDidMount() {
-    this.requestWeather();
+    this.componentDidMount = this.componentDidMount.bind(this);
   }
 
-  requestWeather() {
-    return fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=cologne&appid=ff84f45749b2a4665cf37312097a278b&units=metric`
+  componentDidMount() {
+    cities.forEach((city) => {
+      this.requestWeather(city);
+    });
+  }
+
+  async requestWeather(city = "cologne") {
+    const weather = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=ff84f45749b2a4665cf37312097a278b&units=metric`
     )
       .then((response) => {
-        response.json().then((data) => {
-          const {name, wind, weather, main, sys} = data;
-          this.setState({city: name, wind, weather, main, sys});
+        response.json().then((res) => {
+          let locations = this.state.locations;
+          locations.push(res);
+          this.setState({locations: [...locations]});
+          return;
         });
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .catch((err) => {});
   }
 
   render() {
     return React.createElement(
       "main",
-      {className: "panel center"},
-      WeatherPanel(this.state)
+      {className: "center"},
+      this.state.locations.map((location) => WeatherPanel(location))
     );
   }
 }
