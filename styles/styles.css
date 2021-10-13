@@ -35,9 +35,19 @@ h6 {
 }
 
 .weather-panel__weather-details {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   border-top: 1px solid;
   margin-top: 2rem;
 }
+
+.wind-panel {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .weather-details__max-temp,
 .weather-details__min-temp {
   font-size: 1rem;
