@@ -3,89 +3,72 @@
 const cities = ["cologne", "new%20york", "perth"];
 const e = React.createElement;
 const weatherContainer = document.querySelector("#container");
+const assetsPath = "./assets/svg/";
+const OPEN_WEATHER_URL = 'https://api.openweathermap.org/data/2.5/weather';
+const APP_ID = 'ff84f45749b2a4665cf37312097a278b';
 
-const getDayTime = (sunset, sunrise) => {
-  let timeInMilliSeconds = +new Date();
-  let timeInSeconds = Math.floor(timeInMilliSeconds / 1000);
-  if (timeInSeconds <= sunset && timeInSeconds >= sunrise) {
+const getRequestParams = (city, units = 'metric' ) => {
+  return `?q=${city}&appid=${APP_ID}&units=${units}`;
+}
+
+
+const WEATHER_TYPES = new Map();
+WEATHER_TYPES.set('overcast clouds', 'partly_cloudy');
+WEATHER_TYPES.set('broken clouds', 'partly_cloudy');
+WEATHER_TYPES.set('few clouds', 'partly_cloudy');
+WEATHER_TYPES.set('scattered clouds', 'partly_cloudy');
+WEATHER_TYPES.set('clear sky', 'clear_sky');
+WEATHER_TYPES.set('default', 'clear_sky');
+
+const getDayTime = (sunrise, sunset) => {
+  let timestamp = new Date;
+  if (timestamp <= sunset*1000 && timestamp > sunrise*1000) {
     return "day";
   } else {
     return "night";
   }
 };
 
-const WeatherIcon = (weather, sys) => {
-  let dayTime = getDayTime(sys.sunrise, sys.sunset);
-  switch (weather[0]?.description) {
-    case "scattered clouds" || "few clouds" || "broken clouds":
-      if (dayTime == "day") {
-        return e("img", {
-          key: dayTime,
-          src: `./assets/svg/partly_cloudy_day.svg`,
-          className: "weather-panel__weather-icon",
-        });
-      } else {
-        return e("img", {
-          key: dayTime,
-          src: `./assets/svg/partly_cloudy_night.svg`,
-          className: "weather-panel__weather-icon",
-        });
-      }
-    case "overcast clouds":
-      return e("img", {
-        key: weather[0]?.description,
-        src: `./assets/svg/overcast.svg`,
-        className: "weather-panel__weather-icon",
-      });
-      break;
-    default:
-      if (dayTime == "day") {
-        return e("img", {
-          key: dayTime,
-          src: `./assets/svg/clear_sky_day.svg`,
-          className: "weather-panel__weather-icon",
-        });
-      } else {
-        return e("img", {
-          key: dayTime,
-          src: `./assets/svg/clear_sky_night.svg`,
-          className: "weather-panel__weather-icon",
-        });
-      }
-      break;
-  }
-};
+const WeatherIcon = (weatherType = 'default', sys) =>  {
+  const dayTime = getDayTime(sys.sunrise, sys.sunset);
+  weatherType = WEATHER_TYPES.get(weatherType);
+  return e("img", {
+    key: dayTime,
+    src: `${assetsPath}/${weatherType}_${dayTime}.svg`,
+    className: "weather-panel__weather-icon",
+  });
+}
 
 const getWindDirection = (deg) => {
   if (deg > 11.25 && deg < 33.75) {
     return "NNE";
-  } else if (deg > 33.75 && deg < 56.25) {
+  } else if (deg > 33.75 && deg <= 56.25) {
     return "ENE";
-  } else if (deg > 56.25 && deg < 78.75) {
+  } else if (deg > 56.25 && deg <= 78.75) {
     return "E";
-  } else if (deg > 78.75 && deg < 101.25) {
+  } else if (deg > 78.75 && deg <= 101.25) {
     return "ESE";
-  } else if (deg > 101.25 && deg < 123.75) {
+  } else if (deg > 101.25 && deg <= 123.75) {
     return "ESE";
-  } else if (deg > 123.75 && deg < 146.25) {
+  } else if (deg > 123.75 && deg <= 146.25) {
     return "SE";
-  } else if (deg > 146.25 && deg < 168.75) {
+  } else if (deg > 146.25 && deg <= 168.75) {
     return "SSE";
-  } else if (deg > 168.75 && deg < 191.25) {
+  } else if (deg > 168.75 && deg <= 191.25) {
     return "S";
-  } else if (deg > 191.25 && deg < 213.75) {
+  } else if (deg > 191.25 && deg <= 213.75) {
     return "SSW";
-  } else if (deg > 213.75 && deg < 236.25) {
+  } else if (deg > 213.75 && deg <= 236.25) {
     return "SW";
-  } else if (deg > 236.25 && deg < 258.75) {
+  } else if (deg > 236.25 && deg <= 258.75) {
     return "WSW";
-  } else if (deg > 258.75 && deg < 281.25) {
+  } else if (deg > 258.75 && deg <= 281.25) {
     return "W";
-  } else if (deg > 281.25 && deg < 303.75) {
+  } else if (deg > 281.25 && deg <= 303.75) {
     return "WNW";
-  } else if (deg > 303.75 && deg < 326.25) {
+  } else if (deg > 303.75 && deg <= 326.25) {
     return "NW";
-  } else if (deg > 326.25 && deg < 348.75) {
+  } else if (deg > 326.25 && deg <= 348.75) {
     return "NNW";
   } else {
     return "N";
@@ -122,7 +105,7 @@ const WeatherDetails = (main, name) => {
 };
 
 const GeneralData = (main, name, weather) => {
-  const a = weather[0]?.description;
+  const weatherType = weather[0]?.description;
   return e(
     "div",
     {key: `general-weather-${name}`},
@@ -130,15 +113,17 @@ const GeneralData = (main, name, weather) => {
     e(
       "h6",
       {key: `weather-${name}`, className: "weather-panel__weather-description"},
-      a
+      weatherType
     ),
     e("h2", {key: `temperature-${name}`}, Math.floor(main.temp) + " \u2103")
   );
 };
 
 const WeatherPanel = ({main, name, sys, weather, wind}) => {
+  const weatherType = weather[0]?.description;
+
   return e("div", {key: `weather-panel-${name}`, className: "panel"}, [
-    WeatherIcon(weather, sys),
+    WeatherIcon(weatherType, sys),
     GeneralData(main, name, weather),
     WeatherDetails(main, name),
     WindDetails(wind),
@@ -161,18 +146,17 @@ class App extends React.Component {
   }
 
   async requestWeather(city = "cologne") {
-    const weather = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=ff84f45749b2a4665cf37312097a278b&units=metric`
-    )
-      .then((response) => {
-        response.json().then((res) => {
-          let locations = this.state.locations;
-          locations.push(res);
-          this.setState({locations: [...locations]});
-          return;
-        });
-      })
-      .catch((err) => {});
+    let requestUrl = OPEN_WEATHER_URL + getRequestParams(city)
+    let response = await fetch(
+      requestUrl
+    );
+    response = await response.json();
+
+    this.setState(prevState => {
+      const locations = prevState.locations;
+      locations.push(response)
+      return Object.assign(prevState, { locations: [...locations]})
+    })
   }
 
   render() {
