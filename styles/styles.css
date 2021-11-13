@@ -19,6 +19,16 @@ h6 {
   width: 100%;
 }
 
+.column {
+  display: flex;
+  flex-direction: row;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
 .panel {
   background-color: rgba(0, 0, 0, 0.8);
   font-size: 2rem;
@@ -40,7 +50,6 @@ h6 {
 
 .weather-panel__weather-details {
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
   border-top: 1px solid;
   margin-top: 2rem;

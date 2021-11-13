@@ -10,7 +10,12 @@ const APP_ID = 'ff84f45749b2a4665cf37312097a278b';
 const getRequestParams = (city, units = 'metric' ) => {
   return `?q=${city}&appid=${APP_ID}&units=${units}`;
 }
-
+const  getGlobalTimestamp = () => {
+  let localTime = new Date();
+  let offset = localTime.getTimezoneOffset();
+  let globalTimestamp = +localTime + (offset*60*1000);
+  return globalTimestamp;
+}
 
 const WEATHER_TYPES = new Map();
 WEATHER_TYPES.set('overcast clouds', 'partly_cloudy');
@@ -30,8 +35,12 @@ const getDayTime = (sunrise, sunset) => {
 };
 
 const WeatherIcon = (weatherType = 'default', sys) =>  {
+  if (!WEATHER_TYPES.has(weatherType)) {
+    weatherType = WEATHER_TYPES.get('default');
+  } else {
+    weatherType = WEATHER_TYPES.get(weatherType);
+  }
   const dayTime = getDayTime(sys.sunrise, sys.sunset);
-  weatherType = WEATHER_TYPES.get(weatherType);
   return e("img", {
     key: dayTime,
     src: `${assetsPath}/${weatherType}_${dayTime}.svg`,
@@ -82,13 +91,22 @@ const WindDetails = (wind) => {
   ]);
 };
 
-const WeatherDetails = (main, name) => {
+  const WeatherDetails = (main, name, timezone, globalTimestamp) => {
+  let localTime = globalTimestamp + timezone*1000;
+  localTime = new Date(localTime);
+  localTime = localTime.toLocaleTimeString();
+
   return e(
     "div",
-    {key: `weather-details-${name}`},
+    {key: `weather-details-${name}`, className: "weather-panel__weather-details column"},
     e(
       "div",
       {key: `info-${name}`, className: "weather-panel__weather-details"},
+      e(
+        "span",
+        {key: `local-time-${name}`, className: "weather-details__min-temp row"},
+        "Local time: " + localTime + " \u2103"
+      ),
       e(
         "span",
 
@@ -104,6 +122,12 @@ const WeatherDetails = (main, name) => {
   );
 };
 
+const SearchBar = () => {
+  return  e(
+    "input",
+    {key: `search-bar`, className: "weather-panel__search-bar"},
+  )
+}
 const GeneralData = (main, name, weather) => {
   const weatherType = weather[0]?.description;
   return e(
@@ -119,13 +143,12 @@ const GeneralData = (main, name, weather) => {
   );
 };
 
-const WeatherPanel = ({main, name, sys, weather, wind}) => {
+const WeatherPanel = ({main, name, sys, weather, wind, timezone}, globalTimestamp) => {
   const weatherType = weather[0]?.description;
-
   return e("div", {key: `weather-panel-${name}`, className: "panel"}, [
     WeatherIcon(weatherType, sys),
     GeneralData(main, name, weather),
-    WeatherDetails(main, name),
+    WeatherDetails(main, name, timezone, globalTimestamp),
     WindDetails(wind),
   ]);
 };
@@ -135,18 +158,24 @@ class App extends React.Component {
     super(props);
     this.state = {
       locations: [],
+      globalTimestamp: "",
     };
-    this.componentDidMount = this.componentDidMount.bind(this);
   }
 
   componentDidMount() {
+    this.setState(prevState => {
+      let globalTimestamp = getGlobalTimestamp();
+      return Object.assign(prevState, { globalTimestamp })
+    })
     cities.forEach((city) => {
       this.requestWeather(city);
     });
   }
 
+ 
+
   async requestWeather(city = "cologne") {
-    let requestUrl = OPEN_WEATHER_URL + getRequestParams(city)
+    let requestUrl = OPEN_WEATHER_URL + getRequestParams(city);
     let response = await fetch(
       requestUrl
     );
@@ -162,11 +191,20 @@ class App extends React.Component {
   render() {
     return e(
       "div",
-      {className: "weather-panel center"},
-      this.state.locations
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((locationData) => WeatherPanel(locationData))
-    );
+      {className: "weather-app"},
+      e(
+        "div",
+        {className: "search-bar center"},
+        SearchBar(),
+      ),
+      e(
+        "div",
+        {className: "weather-panel center"},
+        this.state.locations
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((locationData) => WeatherPanel(locationData, this.state.globalTimestamp))
+      )
+    )
   }
 }
 
