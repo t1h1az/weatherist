@@ -24,6 +24,11 @@ h6 {
   flex-direction: row;
 }
 
+.space-between {
+  display:flex;
+  justify-content: space-between;
+}
+
 .row {
   display: flex;
   flex-direction: row;
@@ -41,6 +46,15 @@ h6 {
 
 .weather-panel__weather-description {
   font-size: 1rem;
+}
+
+.weather-details {
+  font-size: 1rem;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid;
+  margin-top: 2rem;
+  padding-top: 1rem;
 }
 
 .weather-panel__weather-icon {
