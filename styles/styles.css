@@ -4,7 +4,7 @@ body {
   /* background-color: rgba(0, 0, 0, 1); */
   color: rgba(255, 255, 255, 1);
   padding: 2rem;
-  background-image: url("../assets/night_sky.png");
+  background-image: url("../assets/night_sky.jpg");
   background-repeat: no-repeat;
   background-size: 100% 100%;
 }
@@ -17,6 +17,16 @@ h6 {
 .center {
   margin: auto;
   width: 100%;
+}
+
+.column {
+  display: flex;
+  flex-direction: row;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
 }
 
 .panel {
@@ -40,7 +50,6 @@ h6 {
 
 .weather-panel__weather-details {
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
   border-top: 1px solid;
   margin-top: 2rem;
@@ -60,4 +69,10 @@ h6 {
 
 .wind-panel > p {
   font-size: 1rem;
+}
+
+@media (min-device-width: 1200px) {
+  .weather-panel {
+    width: 25rem;
+  }
 }
