@@ -25,7 +25,7 @@ h6 {
 }
 
 .space-between {
-  display:flex;
+  display: flex;
   justify-content: space-between;
 }
 
@@ -62,15 +62,17 @@ h6 {
   height: 8rem;
 }
 
-.weather-panel__weather-details {
+.weather-panel__location-details {
   display: flex;
+  font-size: 1rem;
   justify-content: space-between;
   border-top: 1px solid;
   margin-top: 2rem;
   padding-top: 1rem;
 }
 
-.wind-panel {
+.wind-panel,
+.weather-panel__weather-details {
   display: flex;
   flex-direction: row;
   justify-content: space-between;

@@ -1,10 +1,11 @@
 "use strict";
 
-const cities = ["cologne", "new%20york", "perth"];
-const e = React.createElement;
 const weatherContainer = document.querySelector("#container");
+const e = React.createElement;
+const useState = React.useState;
 const assetsPath = "./assets/svg/";
 const OPEN_WEATHER_URL = 'https://api.openweathermap.org/data/2.5/weather';
+const cities = ["cologne", "new%20york", "perth"];
 const APP_ID = 'ff84f45749b2a4665cf37312097a278b';
 
 const getRequestParams = (city, units = 'metric' ) => {
