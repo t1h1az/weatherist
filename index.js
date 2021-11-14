@@ -1,16 +1,22 @@
 "use strict";
 
-const cities = ["cologne", "new%20york", "perth"];
-const e = React.createElement;
 const weatherContainer = document.querySelector("#container");
+const e = React.createElement;
+const useState = React.useState;
 const assetsPath = "./assets/svg/";
 const OPEN_WEATHER_URL = 'https://api.openweathermap.org/data/2.5/weather';
+const cities = ["cologne", "new%20york", "perth"];
 const APP_ID = 'ff84f45749b2a4665cf37312097a278b';
 
 const getRequestParams = (city, units = 'metric' ) => {
   return `?q=${city}&appid=${APP_ID}&units=${units}`;
 }
-
+const  getGlobalTimestamp = () => {
+  let localTime = new Date();
+  let offset = localTime.getTimezoneOffset();
+  let globalTimestamp = +localTime + (offset*60*1000);
+  return globalTimestamp;
+}
 
 const WEATHER_TYPES = new Map();
 WEATHER_TYPES.set('overcast clouds', 'partly_cloudy');
@@ -18,6 +24,8 @@ WEATHER_TYPES.set('broken clouds', 'partly_cloudy');
 WEATHER_TYPES.set('few clouds', 'partly_cloudy');
 WEATHER_TYPES.set('scattered clouds', 'partly_cloudy');
 WEATHER_TYPES.set('clear sky', 'clear_sky');
+WEATHER_TYPES.set('light rain', 'drizzle');
+WEATHER_TYPES.set('moderate rain', 'rain');
 WEATHER_TYPES.set('default', 'clear_sky');
 
 const getDayTime = (sunrise, sunset) => {
@@ -30,8 +38,12 @@ const getDayTime = (sunrise, sunset) => {
 };
 
 const WeatherIcon = (weatherType = 'default', sys) =>  {
+  if (!WEATHER_TYPES.has(weatherType)) {
+    weatherType = WEATHER_TYPES.get('default');
+  } else {
+    weatherType = WEATHER_TYPES.get(weatherType);
+  }
   const dayTime = getDayTime(sys.sunrise, sys.sunset);
-  weatherType = WEATHER_TYPES.get(weatherType);
   return e("img", {
     key: dayTime,
     src: `${assetsPath}/${weatherType}_${dayTime}.svg`,
@@ -82,24 +94,44 @@ const WindDetails = (wind) => {
   ]);
 };
 
-const WeatherDetails = (main, name) => {
+const LocationDetails = (timezone, globalTimestamp) => {
+  let localTime = globalTimestamp + timezone*1000;
+  localTime = new Date(localTime);
+  localTime = localTime.toLocaleTimeString();
+
   return e(
     "div",
-    {key: `weather-details-${name}`},
+    {key: `location-details-${name}`, className: "weather-panel__location-details column"},
     e(
-      "div",
-      {key: `info-${name}`, className: "weather-panel__weather-details"},
-      e(
-        "span",
+      "span",
+      {key: `local-time__label-${name}`},
+      "Local time:"
+    ),
+    e(
+      "span",
+      {key: `local-time__time${name}`},
+      localTime
+    ),
+  );
+};
 
-        {key: `temp_max-${name}`, className: "weather-details__max-temp"},
-        "High: " + Math.floor(main.temp_max) + " \u2103"
-      ),
-      e(
-        "span",
-        {key: `temp_min-${name}`, className: "weather-details__min-temp"},
-        "Low: " + Math.floor(main.temp_min) + " \u2103"
-      )
+const WeatherDetails = (main, name, timezone, globalTimestamp) => {
+  let localTime = globalTimestamp + timezone*1000;
+  localTime = new Date(localTime);
+  localTime = localTime.toLocaleTimeString();
+
+  return e(
+    "p",
+    {key: `weather-details-${name}`, className: "weather-panel__weather-details column space"},
+    e(
+      "span",
+      {key: `temp_max-${name}`, className: "weather-details__max-temp"},
+      "High: " + Math.floor(main.temp_max) + " \u2103"
+    ),
+    e(
+      "span",
+      {key: `temp_min-${name}`, className: "weather-details__min-temp"},
+      "Low: " + Math.floor(main.temp_min) + " \u2103"
     )
   );
 };
@@ -119,12 +151,12 @@ const GeneralData = (main, name, weather) => {
   );
 };
 
-const WeatherPanel = ({main, name, sys, weather, wind}) => {
+const WeatherPanel = ({main, name, sys, weather, wind, timezone}, globalTimestamp) => {
   const weatherType = weather[0]?.description;
-
   return e("div", {key: `weather-panel-${name}`, className: "panel"}, [
     WeatherIcon(weatherType, sys),
     GeneralData(main, name, weather),
+    LocationDetails(timezone, globalTimestamp),
     WeatherDetails(main, name),
     WindDetails(wind),
   ]);
@@ -135,18 +167,24 @@ class App extends React.Component {
     super(props);
     this.state = {
       locations: [],
+      globalTimestamp: "",
     };
-    this.componentDidMount = this.componentDidMount.bind(this);
   }
 
   componentDidMount() {
+    this.setState(prevState => {
+      let globalTimestamp = getGlobalTimestamp();
+      return Object.assign(prevState, { globalTimestamp })
+    })
     cities.forEach((city) => {
       this.requestWeather(city);
     });
   }
 
+ 
+
   async requestWeather(city = "cologne") {
-    let requestUrl = OPEN_WEATHER_URL + getRequestParams(city)
+    let requestUrl = OPEN_WEATHER_URL + getRequestParams(city);
     let response = await fetch(
       requestUrl
     );
@@ -162,11 +200,19 @@ class App extends React.Component {
   render() {
     return e(
       "div",
-      {className: "weather-panel center"},
-      this.state.locations
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((locationData) => WeatherPanel(locationData))
-    );
+      {className: "weather-app"},
+      e(
+        "div",
+        {className: "search-bar center"},
+      ),
+      e(
+        "div",
+        {className: "weather-panel center"},
+        this.state.locations
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((locationData) => WeatherPanel(locationData, this.state.globalTimestamp))
+      )
+    )
   }
 }
 

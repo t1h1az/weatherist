@@ -19,6 +19,21 @@ h6 {
   width: 100%;
 }
 
+.column {
+  display: flex;
+  flex-direction: row;
+}
+
+.space-between {
+  display: flex;
+  justify-content: space-between;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
 .panel {
   background-color: rgba(0, 0, 0, 0.8);
   font-size: 2rem;
@@ -33,21 +48,31 @@ h6 {
   font-size: 1rem;
 }
 
-.weather-panel__weather-icon {
-  float: left;
-  height: 8rem;
-}
-
-.weather-panel__weather-details {
+.weather-details {
+  font-size: 1rem;
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
   border-top: 1px solid;
   margin-top: 2rem;
   padding-top: 1rem;
 }
 
-.wind-panel {
+.weather-panel__weather-icon {
+  float: left;
+  height: 8rem;
+}
+
+.weather-panel__location-details {
+  display: flex;
+  font-size: 1rem;
+  justify-content: space-between;
+  border-top: 1px solid;
+  margin-top: 2rem;
+  padding-top: 1rem;
+}
+
+.wind-panel,
+.weather-panel__weather-details {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
