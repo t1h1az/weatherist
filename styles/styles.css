@@ -24,6 +24,11 @@ h6 {
   flex-direction: row;
 }
 
+.space-between {
+  display: flex;
+  justify-content: space-between;
+}
+
 .row {
   display: flex;
   flex-direction: row;
@@ -43,12 +48,8 @@ h6 {
   font-size: 1rem;
 }
 
-.weather-panel__weather-icon {
-  float: left;
-  height: 8rem;
-}
-
-.weather-panel__weather-details {
+.weather-details {
+  font-size: 1rem;
   display: flex;
   justify-content: space-between;
   border-top: 1px solid;
@@ -56,7 +57,22 @@ h6 {
   padding-top: 1rem;
 }
 
-.wind-panel {
+.weather-panel__weather-icon {
+  float: left;
+  height: 8rem;
+}
+
+.weather-panel__location-details {
+  display: flex;
+  font-size: 1rem;
+  justify-content: space-between;
+  border-top: 1px solid;
+  margin-top: 2rem;
+  padding-top: 1rem;
+}
+
+.wind-panel,
+.weather-panel__weather-details {
   display: flex;
   flex-direction: row;
   justify-content: space-between;

@@ -1,10 +1,11 @@
 "use strict";
 
-const cities = ["cologne", "new%20york", "perth"];
-const e = React.createElement;
 const weatherContainer = document.querySelector("#container");
+const e = React.createElement;
+const useState = React.useState;
 const assetsPath = "./assets/svg/";
 const OPEN_WEATHER_URL = 'https://api.openweathermap.org/data/2.5/weather';
+const cities = ["cologne", "new%20york", "perth"];
 const APP_ID = 'ff84f45749b2a4665cf37312097a278b';
 
 const getRequestParams = (city, units = 'metric' ) => {
@@ -23,6 +24,8 @@ WEATHER_TYPES.set('broken clouds', 'partly_cloudy');
 WEATHER_TYPES.set('few clouds', 'partly_cloudy');
 WEATHER_TYPES.set('scattered clouds', 'partly_cloudy');
 WEATHER_TYPES.set('clear sky', 'clear_sky');
+WEATHER_TYPES.set('light rain', 'drizzle');
+WEATHER_TYPES.set('moderate rain', 'rain');
 WEATHER_TYPES.set('default', 'clear_sky');
 
 const getDayTime = (sunrise, sunset) => {
@@ -91,43 +94,48 @@ const WindDetails = (wind) => {
   ]);
 };
 
-  const WeatherDetails = (main, name, timezone, globalTimestamp) => {
+const LocationDetails = (timezone, globalTimestamp) => {
   let localTime = globalTimestamp + timezone*1000;
   localTime = new Date(localTime);
   localTime = localTime.toLocaleTimeString();
 
   return e(
     "div",
-    {key: `weather-details-${name}`, className: "weather-panel__weather-details column"},
+    {key: `location-details-${name}`, className: "weather-panel__location-details column"},
     e(
-      "div",
-      {key: `info-${name}`, className: "weather-panel__weather-details"},
-      e(
-        "span",
-        {key: `local-time-${name}`, className: "weather-details__min-temp row"},
-        "Local time: " + localTime + " \u2103"
-      ),
-      e(
-        "span",
+      "span",
+      {key: `local-time__label-${name}`},
+      "Local time:"
+    ),
+    e(
+      "span",
+      {key: `local-time__time${name}`},
+      localTime
+    ),
+  );
+};
 
-        {key: `temp_max-${name}`, className: "weather-details__max-temp"},
-        "High: " + Math.floor(main.temp_max) + " \u2103"
-      ),
-      e(
-        "span",
-        {key: `temp_min-${name}`, className: "weather-details__min-temp"},
-        "Low: " + Math.floor(main.temp_min) + " \u2103"
-      )
+const WeatherDetails = (main, name, timezone, globalTimestamp) => {
+  let localTime = globalTimestamp + timezone*1000;
+  localTime = new Date(localTime);
+  localTime = localTime.toLocaleTimeString();
+
+  return e(
+    "p",
+    {key: `weather-details-${name}`, className: "weather-panel__weather-details column space"},
+    e(
+      "span",
+      {key: `temp_max-${name}`, className: "weather-details__max-temp"},
+      "High: " + Math.floor(main.temp_max) + " \u2103"
+    ),
+    e(
+      "span",
+      {key: `temp_min-${name}`, className: "weather-details__min-temp"},
+      "Low: " + Math.floor(main.temp_min) + " \u2103"
     )
   );
 };
 
-const SearchBar = () => {
-  return  e(
-    "input",
-    {key: `search-bar`, className: "weather-panel__search-bar"},
-  )
-}
 const GeneralData = (main, name, weather) => {
   const weatherType = weather[0]?.description;
   return e(
@@ -148,7 +156,8 @@ const WeatherPanel = ({main, name, sys, weather, wind, timezone}, globalTimestam
   return e("div", {key: `weather-panel-${name}`, className: "panel"}, [
     WeatherIcon(weatherType, sys),
     GeneralData(main, name, weather),
-    WeatherDetails(main, name, timezone, globalTimestamp),
+    LocationDetails(timezone, globalTimestamp),
+    WeatherDetails(main, name),
     WindDetails(wind),
   ]);
 };
@@ -195,7 +204,6 @@ class App extends React.Component {
       e(
         "div",
         {className: "search-bar center"},
-        SearchBar(),
       ),
       e(
         "div",
