@@ -1,12 +1,16 @@
-body {
-  min-height: 100vh;
-  font-family: "Roboto";
-  /* background-color: rgba(0, 0, 0, 1); */
-  color: rgba(255, 255, 255, 1);
-  padding: 2rem;
+html {
+  background-color: rgba(0, 0, 0, 1);
   background-image: url("../assets/night_sky.jpg");
   background-repeat: no-repeat;
   background-size: 100% 100%;
+}
+
+body {
+  min-height: 100vh;
+  font-family: "Roboto";
+  background-color: rgba(0, 0, 0, 0.9);
+  color: rgba(255, 255, 255, 1);
+  padding: 2rem;
 }
 
 h2,
@@ -35,13 +39,21 @@ h6 {
 }
 
 .panel {
-  background-color: rgba(0, 0, 0, 0.8);
+  transition: 1s background-color ease;
+  background-image: url("../assets/night_sky.jpg");
   font-size: 2rem;
   font-weight: 200;
   border: 1px solid grey;
   margin-bottom: 3rem;
   padding: 1rem;
   border-radius: 5px;
+  background-size: cover;
+  background-blend-mode: multiply;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+.panel:hover {
+  transition: 1s background-color ease;
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .weather-panel__weather-description {
@@ -92,3 +104,34 @@ h6 {
     width: 25rem;
   }
 }
+
+.footer {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  z-index: 999;
+  font-weight: 200;
+  font-size: 16px;
+  color: #fff;
+}
+
+/* .footer {
+  animation: x 25s linear infinite alternate;
+}
+
+.footer-bouncing {
+  animation: y 25s linear infinite alternate;
+}
+
+@keyframes x {
+  100% {
+    transform: translateX(calc(100vw - 1200px));
+  }
+}
+
+@keyframes y {
+  100% {
+    transform: translateY(calc(100vh - 100px));
+  }
+} */

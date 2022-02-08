@@ -4,42 +4,42 @@ const weatherContainer = document.querySelector("#container");
 const e = React.createElement;
 const useState = React.useState;
 const assetsPath = "./assets/svg/";
-const OPEN_WEATHER_URL = 'https://api.openweathermap.org/data/2.5/weather';
+const OPEN_WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather";
 const cities = ["cologne", "new%20york", "perth"];
-const APP_ID = 'ff84f45749b2a4665cf37312097a278b';
+const APP_ID = "ff84f45749b2a4665cf37312097a278b";
 
-const getRequestParams = (city, units = 'metric' ) => {
+const getRequestParams = (city, units = "metric") => {
   return `?q=${city}&appid=${APP_ID}&units=${units}`;
-}
-const  getGlobalTimestamp = () => {
+};
+const getGlobalTimestamp = () => {
   let localTime = new Date();
   let offset = localTime.getTimezoneOffset();
-  let globalTimestamp = +localTime + (offset*60*1000);
+  let globalTimestamp = +localTime + offset * 60 * 1000;
   return globalTimestamp;
-}
+};
 
 const WEATHER_TYPES = new Map();
-WEATHER_TYPES.set('overcast clouds', 'partly_cloudy');
-WEATHER_TYPES.set('broken clouds', 'partly_cloudy');
-WEATHER_TYPES.set('few clouds', 'partly_cloudy');
-WEATHER_TYPES.set('scattered clouds', 'partly_cloudy');
-WEATHER_TYPES.set('clear sky', 'clear_sky');
-WEATHER_TYPES.set('light rain', 'drizzle');
-WEATHER_TYPES.set('moderate rain', 'rain');
-WEATHER_TYPES.set('default', 'clear_sky');
+WEATHER_TYPES.set("overcast clouds", "partly_cloudy");
+WEATHER_TYPES.set("broken clouds", "partly_cloudy");
+WEATHER_TYPES.set("few clouds", "partly_cloudy");
+WEATHER_TYPES.set("scattered clouds", "partly_cloudy");
+WEATHER_TYPES.set("clear sky", "clear_sky");
+WEATHER_TYPES.set("light rain", "drizzle");
+WEATHER_TYPES.set("moderate rain", "rain");
+WEATHER_TYPES.set("default", "clear_sky");
 
 const getDayTime = (sunrise, sunset) => {
-  let timestamp = new Date;
-  if (timestamp <= sunset*1000 && timestamp > sunrise*1000) {
+  let timestamp = new Date();
+  if (timestamp <= sunset * 1000 && timestamp > sunrise * 1000) {
     return "day";
   } else {
     return "night";
   }
 };
 
-const WeatherIcon = (weatherType = 'default', sys) =>  {
+const WeatherIcon = (weatherType = "default", sys) => {
   if (!WEATHER_TYPES.has(weatherType)) {
-    weatherType = WEATHER_TYPES.get('default');
+    weatherType = WEATHER_TYPES.get("default");
   } else {
     weatherType = WEATHER_TYPES.get(weatherType);
   }
@@ -49,7 +49,7 @@ const WeatherIcon = (weatherType = 'default', sys) =>  {
     src: `${assetsPath}/${weatherType}_${dayTime}.svg`,
     className: "weather-panel__weather-icon",
   });
-}
+};
 
 const getWindDirection = (deg) => {
   if (deg > 11.25 && deg < 33.75) {
@@ -95,34 +95,32 @@ const WindDetails = (wind) => {
 };
 
 const LocationDetails = (timezone, globalTimestamp) => {
-  let localTime = globalTimestamp + timezone*1000;
+  let localTime = globalTimestamp + timezone * 1000;
   localTime = new Date(localTime);
   localTime = localTime.toLocaleTimeString();
 
   return e(
     "div",
-    {key: `location-details-${name}`, className: "weather-panel__location-details column"},
-    e(
-      "span",
-      {key: `local-time__label-${name}`},
-      "Local time:"
-    ),
-    e(
-      "span",
-      {key: `local-time__time${name}`},
-      localTime
-    ),
+    {
+      key: `location-details-${name}`,
+      className: "weather-panel__location-details column",
+    },
+    e("span", {key: `local-time__label-${name}`}, "Local time:"),
+    e("span", {key: `local-time__time${name}`}, localTime)
   );
 };
 
 const WeatherDetails = (main, name, timezone, globalTimestamp) => {
-  let localTime = globalTimestamp + timezone*1000;
+  let localTime = globalTimestamp + timezone * 1000;
   localTime = new Date(localTime);
   localTime = localTime.toLocaleTimeString();
 
   return e(
     "p",
-    {key: `weather-details-${name}`, className: "weather-panel__weather-details column space"},
+    {
+      key: `weather-details-${name}`,
+      className: "weather-panel__weather-details column space",
+    },
     e(
       "span",
       {key: `temp_max-${name}`, className: "weather-details__max-temp"},
@@ -140,7 +138,9 @@ const GeneralData = (main, name, weather) => {
   const weatherType = weather[0]?.description;
   return e(
     "div",
-    {key: `general-weather-${name}`},
+    {
+      key: `general-weather-${name}`,
+    },
     e("h2", {key: "city"}, name),
     e(
       "h6",
@@ -151,7 +151,10 @@ const GeneralData = (main, name, weather) => {
   );
 };
 
-const WeatherPanel = ({main, name, sys, weather, wind, timezone}, globalTimestamp) => {
+const WeatherPanel = (
+  {main, name, sys, weather, wind, timezone},
+  globalTimestamp
+) => {
   const weatherType = weather[0]?.description;
   return e("div", {key: `weather-panel-${name}`, className: "panel"}, [
     WeatherIcon(weatherType, sys),
@@ -161,6 +164,8 @@ const WeatherPanel = ({main, name, sys, weather, wind, timezone}, globalTimestam
     WindDetails(wind),
   ]);
 };
+
+const Footer = () => {};
 
 class App extends React.Component {
   constructor(props) {
@@ -172,47 +177,55 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       let globalTimestamp = getGlobalTimestamp();
-      return Object.assign(prevState, { globalTimestamp })
-    })
+      return Object.assign(prevState, {globalTimestamp});
+    });
     cities.forEach((city) => {
       this.requestWeather(city);
     });
   }
 
- 
-
   async requestWeather(city = "cologne") {
     let requestUrl = OPEN_WEATHER_URL + getRequestParams(city);
-    let response = await fetch(
-      requestUrl
-    );
+    let response = await fetch(requestUrl);
     response = await response.json();
 
-    this.setState(prevState => {
+    this.setState((prevState) => {
       const locations = prevState.locations;
-      locations.push(response)
-      return Object.assign(prevState, { locations: [...locations]})
-    })
+      locations.push(response);
+      return Object.assign(prevState, {locations: [...locations]});
+    });
   }
 
   render() {
     return e(
       "div",
       {className: "weather-app"},
-      e(
-        "div",
-        {className: "search-bar center"},
-      ),
+      e("div", {className: "search-bar center"}),
       e(
         "div",
         {className: "weather-panel center"},
         this.state.locations
           .sort((a, b) => a.name.localeCompare(b.name))
-          .map((locationData) => WeatherPanel(locationData, this.state.globalTimestamp))
+          .map((locationData) =>
+            WeatherPanel(locationData, this.state.globalTimestamp)
+          )
+      ),
+      e(
+        "footer",
+        {key: `footer`, className: "footer"},
+        e(
+          "div",
+          {key: "footer-bouncing", className: "footer-bouncing"},
+          e(
+            "p",
+            {key: `footer__text-1`, className: "footer__text"},
+            "2022 - brought to you with love by siteraffer"
+          )
+        )
       )
-    )
+    );
   }
 }
 
